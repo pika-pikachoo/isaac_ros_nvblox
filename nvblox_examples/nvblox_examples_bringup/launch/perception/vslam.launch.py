@@ -66,6 +66,8 @@ def generate_launch_description():
     # Conditionals for setup
     setup_for_realsense = IfCondition(
         LaunchConfiguration('setup_for_realsense', default='False'))
+    setup_for_lipsedge = IfCondition(
+        LaunchConfiguration('setup_for_lipsedge', default='False'))
     setup_for_isaac_sim = IfCondition(
         LaunchConfiguration('setup_for_isaac_sim', default='False'))
 
@@ -123,6 +125,16 @@ def generate_launch_description():
         SetParameter(name='base_frame', value='camera_link',
                      condition=setup_for_realsense),
 
+        # Parameters for LIPSedge
+        SetParameter(name='enable_rectified_pose', value=True,
+                     condition=setup_for_lipsedge),
+        SetParameter(name='denoise_input_images', value=False,
+                     condition=setup_for_lipsedge),
+        SetParameter(name='rectified_images', value=True,
+                     condition=setup_for_lipsedge),
+        SetParameter(name='base_frame', value='camera_link',
+                     condition=setup_for_lipsedge),
+
         # Remappings for Isaac Sim
         SetRemap(src=['/stereo_camera/left/camera_info'],
                  dst=['/front/stereo_camera/left/camera_info'],
@@ -151,6 +163,20 @@ def generate_launch_description():
                  dst=['/camera/realsense_splitter_node/output/infra_2'],
                  condition=setup_for_realsense),
 
+        # Remappings for LIPSedge
+        SetRemap(src=['/stereo_camera/left/camera_info'],
+                 dst=['/camera/infra1/camera_info'],
+                 condition=setup_for_lipsedge),
+        SetRemap(src=['/stereo_camera/right/camera_info'],
+                 dst=['/camera/infra2/camera_info'],
+                 condition=setup_for_lipsedge),
+        SetRemap(src=['/stereo_camera/left/image'],
+                 dst=['/camera/infra1/image_rect_raw'],
+                 condition=setup_for_lipsedge),
+        SetRemap(src=['/stereo_camera/right/image'],
+                 dst=['/camera/infra2/image_rect_raw'],
+                 condition=setup_for_lipsedge),
+
         #################################################
         ######### ODOMETRY FLATTENER NODE SETUP #########
         #################################################
@@ -161,11 +187,15 @@ def generate_launch_description():
                      condition=setup_for_isaac_sim),
         SetParameter(name='input_child_frame_id', value='camera_link',
                      condition=setup_for_realsense),
+        SetParameter(name='input_child_frame_id', value='camera_link',
+                     condition=setup_for_lipsedge),
         SetParameter(name='output_parent_frame_id', value=LaunchConfiguration('output_odom_frame_name')),
         SetParameter(name='output_child_frame_id', value='base_link',
                      condition=setup_for_isaac_sim),
         SetParameter(name='output_child_frame_id', value='camera_link',
                      condition=setup_for_realsense),
+        SetParameter(name='output_child_frame_id', value='camera_link',
+                     condition=setup_for_lipsedge),
         SetParameter(name='invert_output_transform', value=True),
 
         ########################################

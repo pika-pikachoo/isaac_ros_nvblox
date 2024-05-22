@@ -38,6 +38,8 @@ def generate_launch_description():
     dynamics_config = os.path.join(specialization_dir, 'nvblox_dynamics.yaml')
     realsense_config = os.path.join(
         specialization_dir, 'nvblox_realsense.yaml')
+    lipsedge_config = os.path.join(
+        specialization_dir, 'nvblox_lipsedge.yaml')
     zed_config = os.path.join(
         specialization_dir, 'nvblox_zed.yaml')
     simulation_config = os.path.join(
@@ -50,9 +52,11 @@ def generate_launch_description():
         LaunchConfiguration('setup_for_isaac_sim', default='False'))
     setup_for_realsense = IfCondition(
         LaunchConfiguration('setup_for_realsense', default='False'))
+    setup_for_lipsedge = IfCondition(
+        LaunchConfiguration('setup_for_lipsedge', default='False'))
     setup_for_zed = IfCondition(
         LaunchConfiguration('setup_for_zed', default='False'))
-    
+
     # Option to attach the nodes to a shared component container for speed ups through intra process communication.
     # Make sure to set the 'component_container_name' to the name of the component container you want to attach to.
     attach_to_shared_component_container_arg = LaunchConfiguration('attach_to_shared_component_container', default=False)
@@ -66,7 +70,7 @@ def generate_launch_description():
         output='screen',
         condition=UnlessCondition(attach_to_shared_component_container_arg)
     )
-    
+
     load_composable_nodes = LoadComposableNodes(
         target_container=component_container_name_arg,
         composable_node_descriptions=[
@@ -85,6 +89,8 @@ def generate_launch_description():
                               condition=setup_for_zed),
         SetParametersFromFile(realsense_config,
                               condition=setup_for_realsense),
+        SetParametersFromFile(lipsedge_config,
+                              condition=setup_for_lipsedge),
         SetParametersFromFile(simulation_config,
                               condition=setup_for_isaac_sim),
         SetParameter(name='global_frame',
@@ -103,6 +109,20 @@ def generate_launch_description():
         SetRemap(src=['color/camera_info'],
                  dst=['/camera/color/camera_info'],
                  condition=setup_for_realsense),
+
+        # Remappings for LIPSedge data
+        SetRemap(src=['depth/image'],
+                 dst=['/camera/depth/image_rect_raw'],
+                 condition=setup_for_lipsedge),
+        SetRemap(src=['depth/camera_info'],
+                 dst=['/camera/depth/camera_info'],
+                 condition=setup_for_lipsedge),
+        SetRemap(src=['color/image'],
+                 dst=['/camera/color/image_raw'],
+                 condition=setup_for_lipsedge),
+        SetRemap(src=['color/camera_info'],
+                 dst=['/camera/color/camera_info'],
+                 condition=setup_for_lipsedge),
 
         # Remappings for zed
 	    SetRemap(src=['depth/image'],
