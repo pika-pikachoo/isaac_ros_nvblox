@@ -36,8 +36,6 @@ def generate_launch_description():
     # Config files
     base_config = os.path.join(base_config_dir, 'nvblox_base.yaml')
     humans_config = os.path.join(specialization_dir, 'nvblox_humans.yaml')
-    realsense_config = os.path.join(
-        specialization_dir, 'nvblox_realsense.yaml')
     lipsedge_config = os.path.join(
         specialization_dir, 'nvblox_lipsedge.yaml')
     simulation_config = os.path.join(
@@ -46,8 +44,6 @@ def generate_launch_description():
     # Conditionals for setup
     setup_for_isaac_sim = IfCondition(
         LaunchConfiguration('setup_for_isaac_sim', default='False'))
-    setup_for_realsense = IfCondition(
-        LaunchConfiguration('setup_for_realsense', default='False'))
     setup_for_lipsedge = IfCondition(
         LaunchConfiguration('setup_for_lipsedge', default='False'))
 
@@ -79,34 +75,12 @@ def generate_launch_description():
         # Set parameters with specializations
         SetParametersFromFile(base_config),
         SetParametersFromFile(humans_config),
-        SetParametersFromFile(realsense_config,
-                              condition=setup_for_realsense),
         SetParametersFromFile(lipsedge_config,
                               condition=setup_for_lipsedge),
         SetParametersFromFile(simulation_config,
                               condition=setup_for_isaac_sim),
         SetParameter(name='global_frame',
                      value=LaunchConfiguration('global_frame', default='odom')),
-
-        # Remappings for realsense data
-        SetRemap(src=['depth/image'],
-                 dst=['/camera/realsense_splitter_node/output/depth'],
-                 condition=setup_for_realsense),
-        SetRemap(src=['depth/camera_info'],
-                 dst=['/camera/depth/camera_info'],
-                 condition=setup_for_realsense),
-        SetRemap(src=['color/image'],
-                 dst=['/camera/color/image_raw'],
-                 condition=setup_for_realsense),
-        SetRemap(src=['color/camera_info'],
-                 dst=['/camera/color/camera_info'],
-                 condition=setup_for_realsense),
-        SetRemap(src=['mask/image'],
-                 dst=['/unet/raw_segmentation_mask_depadded'],
-                 condition=setup_for_realsense),
-        SetRemap(src=['mask/camera_info'],
-                 dst=['/camera/color/camera_info'],
-                 condition=setup_for_realsense),
 
         # Remappings for LIPSedge data
         SetRemap(src=['depth/image'],

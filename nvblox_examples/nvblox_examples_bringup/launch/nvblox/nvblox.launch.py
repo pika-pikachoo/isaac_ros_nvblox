@@ -36,12 +36,8 @@ def generate_launch_description():
     # Config files
     base_config = os.path.join(base_config_dir, 'nvblox_base.yaml')
     dynamics_config = os.path.join(specialization_dir, 'nvblox_dynamics.yaml')
-    realsense_config = os.path.join(
-        specialization_dir, 'nvblox_realsense.yaml')
     lipsedge_config = os.path.join(
         specialization_dir, 'nvblox_lipsedge.yaml')
-    zed_config = os.path.join(
-        specialization_dir, 'nvblox_zed.yaml')
     simulation_config = os.path.join(
         specialization_dir, 'nvblox_isaac_sim.yaml')
 
@@ -50,12 +46,8 @@ def generate_launch_description():
         LaunchConfiguration('setup_for_dynamics', default='False'))
     setup_for_isaac_sim = IfCondition(
         LaunchConfiguration('setup_for_isaac_sim', default='False'))
-    setup_for_realsense = IfCondition(
-        LaunchConfiguration('setup_for_realsense', default='False'))
     setup_for_lipsedge = IfCondition(
         LaunchConfiguration('setup_for_lipsedge', default='False'))
-    setup_for_zed = IfCondition(
-        LaunchConfiguration('setup_for_zed', default='False'))
 
     # Option to attach the nodes to a shared component container for speed ups through intra process communication.
     # Make sure to set the 'component_container_name' to the name of the component container you want to attach to.
@@ -85,30 +77,12 @@ def generate_launch_description():
         SetParametersFromFile(base_config),
         SetParametersFromFile(dynamics_config,
                               condition=setup_for_dynamics),
-        SetParametersFromFile(zed_config,
-                              condition=setup_for_zed),
-        SetParametersFromFile(realsense_config,
-                              condition=setup_for_realsense),
         SetParametersFromFile(lipsedge_config,
                               condition=setup_for_lipsedge),
         SetParametersFromFile(simulation_config,
                               condition=setup_for_isaac_sim),
         SetParameter(name='global_frame',
                      value=LaunchConfiguration('global_frame', default='odom')),
-
-        # Remappings for realsense data
-        SetRemap(src=['depth/image'],
-                 dst=['/camera/realsense_splitter_node/output/depth'],
-                 condition=setup_for_realsense),
-        SetRemap(src=['depth/camera_info'],
-                 dst=['/camera/depth/camera_info'],
-                 condition=setup_for_realsense),
-        SetRemap(src=['color/image'],
-                 dst=['/camera/color/image_raw'],
-                 condition=setup_for_realsense),
-        SetRemap(src=['color/camera_info'],
-                 dst=['/camera/color/camera_info'],
-                 condition=setup_for_realsense),
 
         # Remappings for LIPSedge data
         SetRemap(src=['depth/image'],
@@ -123,23 +97,6 @@ def generate_launch_description():
         SetRemap(src=['color/camera_info'],
                  dst=['/camera/color/camera_info'],
                  condition=setup_for_lipsedge),
-
-        # Remappings for zed
-	    SetRemap(src=['depth/image'],
-                 dst=['/zed2/zed_node/depth/depth_registered'],
-                 condition=setup_for_zed),
-        SetRemap(src=['depth/camera_info'],
-                 dst=['/zed2/zed_node/depth/camera_info'],
-                 condition=setup_for_zed),
-        SetRemap(src=['color/image'],
-                 dst=['/zed2/zed_node/rgb/image_rect_color'],
-                 condition=setup_for_zed),
-        SetRemap(src=['color/camera_info'],
-                 dst=['/zed2/zed_node/rgb/camera_info'],
-                 condition=setup_for_zed),
-        SetRemap(src=['pose'],
-                 dst=['/zed2/zed_node/pose'],
-                 condition=setup_for_zed),
 
         # Remappings for isaac sim data
         SetRemap(src=['depth/image'],
