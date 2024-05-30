@@ -78,6 +78,7 @@ def generate_launch_description():
             bringup_dir, 'launch', 'perception', 'vslam.launch.py')]),
         launch_arguments={'output_odom_frame_name': global_frame,
                           'setup_for_lipsedge': 'True',
+                          'img_jitter_threshold': '50.00',
                           'run_odometry_flattening': LaunchConfiguration('flatten_odometry_to_2d'),
                           'attach_to_shared_component_container': 'True',
                           'component_container_name': shared_container_name}.items())

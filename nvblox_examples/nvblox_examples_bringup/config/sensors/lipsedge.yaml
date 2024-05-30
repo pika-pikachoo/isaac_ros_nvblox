@@ -27,8 +27,8 @@ color_qos: "SENSOR_DATA"
 
 depth_module:
   profile: '640x480x30'
-  emitter_enabled: 1
-  emitter_on_off: true
+  emitter_enabled: 0
+  emitter_on_off: false
 depth_qos: "SENSOR_DATA"
 depth_info_qos: "SENSOR_DATA"
 

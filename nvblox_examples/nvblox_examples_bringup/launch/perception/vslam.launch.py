@@ -122,6 +122,8 @@ def generate_launch_description():
                      condition=setup_for_lipsedge),
         SetParameter(name='base_frame', value='camera_link',
                      condition=setup_for_lipsedge),
+        SetParameter(name='img_jitter_threshold_ms', value=LaunchConfiguration('img_jitter_threshold'),
+                     condition=setup_for_lipsedge),
 
         # Remappings for Isaac Sim
         SetRemap(src=['/stereo_camera/left/camera_info'],
